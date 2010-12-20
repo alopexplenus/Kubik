@@ -1,8 +1,7 @@
-var map,
-    canvas,
-	nu, //need update
-    overlay;
+var canvas, nu; //need update
+	//overlay;
 var pi=Math.PI;
+var dotrad = 5;
 var key=[0,0,0,0]; // left, right, up, down
 var dots = [];
 var deltatheta=0, deltaphi=0;
@@ -10,7 +9,8 @@ var a=80; //полстороны куба
 var xCoords = [];
 var yCoords = [];
 var zCoords = [];
-var x0=200, y0=150;
+var cubeside1;
+var x0=150, y0=150;
 var phi=0,theta=0,phirad,thetarad;
 var dotscount=0;
 
@@ -56,6 +56,18 @@ function drawCanvas(){
 		yCoords[i]=yCoord;
 		zCoords[i]=zCoord;
     }
+	var squareY = [ yCoords[0]+y0,yCoords[1]+y0,yCoords[2]+y0,yCoords[3]+y0];
+	var squareX = [ xCoords[0]+x0,xCoords[1]+x0,xCoords[2]+x0,xCoords[3]+x0];
+	var mypat = "M "+squareX[0]+" "+squareY[0];
+	var numbers = [0,1,3,2];
+	for (var c=1;c<4;c++) mypat+="  L "+squareX[numbers[c]]+" "+squareY[numbers[c]];
+	mypat+=" z";
+	//alert(mypat);
+	if (!cubeside1) cubeside1 = canvas.path().attr({stroke: "none", fill: "#000"});
+	cubeside1.show().attr({
+		path: mypat,
+		fill: "#099"
+	});
 }
 function update(){ 
 	if (nu) drawCanvas();
@@ -77,15 +89,16 @@ document.onkeyup=function(e){changeKey((e||window.event).keyCode, 0);};
 window.onload=function(){
 //	alert("test");
 	makecube();
-    canvas=Raphael(document.getElementById("canvas"),400,300);
+    canvas=Raphael(document.getElementById("canvas"),600,300);
     canvas.rect(0, 150, 400, 150).attr({stroke: "none", fill: "none"});
 	for (var i=0; i<xCoords.length; i++){ 
 		xCoords[i]*=a;
 		yCoords[i]*=a;
 		zCoords[i]*=a;
-		dots[i]=canvas.circle(xCoords[i]+x0,yCoords[i]+y0,10);
+		dots[i]=canvas.circle(xCoords[i]+x0,yCoords[i]+y0,dotrad);
 		 dots[i].show().attr({fill:"#f00"});
 	}
+	x0+=300;
 	drawCanvas();
-    setInterval(update, 35);//цикл ожидания нажатия клавиш и обновления картинки
+    setInterval(update, 100);//цикл ожидания нажатия клавиш и обновления картинки
 };
