@@ -9,7 +9,11 @@ var a=80; //полстороны куба
 var xCoords = [];
 var yCoords = [];
 var zCoords = [];
-var cubeside1;
+var orderCoords = [];
+var toppoint;
+var firstCircle = [];
+var secondCircle = [];
+var cubeside = []; 
 var x0=150, y0=150;
 var phi=0,theta=0,phirad,thetarad;
 var dotscount=0;
@@ -28,7 +32,7 @@ function makecube(){
 	} 
 } 
 
-function drawCanvas(){
+function drawCanvas(){ // Вот самая главная, тут всё рисуется
 	var xCoord, zCoord, yCoord; 
 	deltaphi=0.02*(key[1]-key[0]);
 	deltatheta=0.02*(key[3]-key[2]);
@@ -51,23 +55,46 @@ function drawCanvas(){
 			zCoord=thetarad*Math.cos(theta+deltatheta);
 		}
 		dots[i].translate(xCoord-xCoords[i],yCoord-yCoords[i]);
-		dots[i].attr({opacity: zCoord/2/a+1});
+		dots[i].attr({opacity: zCoord/2/a+1, fill: "#f00"});
 		xCoords[i]=xCoord;
 		yCoords[i]=yCoord;
 		zCoords[i]=zCoord;
+		orderCoords[i]=zCoords[i];
     }
-	var squareY = [ yCoords[0]+y0,yCoords[1]+y0,yCoords[2]+y0,yCoords[3]+y0];
-	var squareX = [ xCoords[0]+x0,xCoords[1]+x0,xCoords[2]+x0,xCoords[3]+x0];
-	var mypat = "M "+squareX[0]+" "+squareY[0];
-	var numbers = [0,1,3,2];
-	for (var c=1;c<4;c++) mypat+="  L "+squareX[numbers[c]]+" "+squareY[numbers[c]];
-	mypat+=" z";
-	//alert(mypat);
-	if (!cubeside1) cubeside1 = canvas.path().attr({stroke: "none", fill: "#000"});
-	cubeside1.show().attr({
-		path: mypat,
-		fill: "#099"
-	});
+	orderCoords.sort(function(a,b){return (b-a)});
+	//alert(orderCoords);
+	for(cs=0;cs<8;cs++){ 
+		switch (zCoords[cs]){ 
+			case orderCoords[0]: toppoint=cs;
+			break;
+			case orderCoords[1]: 
+			firstCircle[0]=cs;
+			firstCircle[3]=cs;
+			break;
+			case orderCoords[2]: firstCircle[1]=cs;
+			break;
+			case orderCoords[3]: firstCircle[2]=cs;
+			break;
+			case orderCoords[4]: secondCircle[2]=cs;
+			case orderCoords[5]: secondCircle[1]=cs;
+			case orderCoords[6]: secondCircle[0]=cs;
+		} 
+	} 
+	dots[toppoint].attr({fill: "#fff"});
+	for (var k=0;k<1;k++){
+		var squareY = [ yCoords[toppoint]+y0,yCoords[firstCircle[k]]+y0,yCoords[secondCircle[k]]+y0,yCoords[firstCircle[k+1]]+y0];
+		var squareX = [ xCoords[toppoint]+x0,xCoords[firstCircle[k]]+x0,xCoords[secondCircle[k]]+x0,xCoords[firstCircle[k+1]]+x0];
+		var mypat = "M "+squareX[0]+" "+squareY[0];
+		var numbers = [0,1,3,2];
+		for (var c=1;c<4;c++) mypat+="  L "+squareX[numbers[c]]+" "+squareY[numbers[c]];
+		mypat+=" z";
+		//alert(mypat);
+		if (!cubeside[k]) cubeside[k] = canvas.path().attr({stroke: "none", fill: "#000"});
+		cubeside[k].show().attr({
+			path: mypat,
+			fill: "#099"
+		});
+	}
 }
 function update(){ 
 	if (nu) drawCanvas();
