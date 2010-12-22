@@ -10,9 +10,14 @@ var xCoords = [];
 var yCoords = [];
 var zCoords = [];
 var orderCoords = [];
-var toppoint;
-var firstCircle = [];
-var secondCircle = [];
+var bottom1;
+var bottom2;
+var bottom4;
+var bottom3;
+var top1;
+var top2;
+var top4;
+var top3;
 var cubeside = []; 
 var x0=150, y0=150;
 var phi=0,theta=0,phirad,thetarad;
@@ -62,40 +67,50 @@ function drawCanvas(){ // Вот самая главная, тут всё рис
 		orderCoords[i]=zCoords[i];
     }
 	orderCoords.sort(function(a,b){return (b-a)});
+	var top4Coords = orderCoords[1]+orderCoords[2]-orderCoords[0];
+	var bottom4Coords = orderCoords[7]+orderCoords[6]-orderCoords[8];
 	//alert(orderCoords);
 	for(cs=0;cs<8;cs++){ 
 		switch (zCoords[cs]){ 
-			case orderCoords[0]: toppoint=cs;
+			case orderCoords[0]: top1=cs;
 			break;
-			case orderCoords[1]: 
-			firstCircle[0]=cs;
-			firstCircle[3]=cs;
+			case orderCoords[1]: top2=cs;
 			break;
-			case orderCoords[2]: firstCircle[1]=cs;
+			case orderCoords[2]: top3=cs;
 			break;
-			case orderCoords[3]: firstCircle[2]=cs;
+			case orderCoords[7]: bottom1=cs;
 			break;
-			case orderCoords[4]: secondCircle[2]=cs;
-			case orderCoords[5]: secondCircle[1]=cs;
-			case orderCoords[6]: secondCircle[0]=cs;
+			case orderCoords[6]: bottom2=cs;
+			break;
+			case orderCoords[5]: bottom3=cs;
+			break;
+			case top4Coords: top4=cs;
+			break;
+			case bottom4Coords: bottom4=cs;
+			break;
 		} 
 	} 
-	dots[toppoint].attr({fill: "#fff"});
-	for (var k=0;k<1;k++){
-		var squareY = [ yCoords[toppoint]+y0,yCoords[firstCircle[k]]+y0,yCoords[secondCircle[k]]+y0,yCoords[firstCircle[k+1]]+y0];
-		var squareX = [ xCoords[toppoint]+x0,xCoords[firstCircle[k]]+x0,xCoords[secondCircle[k]]+x0,xCoords[firstCircle[k+1]]+x0];
-		var mypat = "M "+squareX[0]+" "+squareY[0];
-		var numbers = [0,1,3,2];
-		for (var c=1;c<4;c++) mypat+="  L "+squareX[numbers[c]]+" "+squareY[numbers[c]];
-		mypat+=" z";
-		//alert(mypat);
-		if (!cubeside[k]) cubeside[k] = canvas.path().attr({stroke: "none", fill: "#000"});
-		cubeside[k].show().attr({
-			path: mypat,
-			fill: "#099"
-		});
-	}
+	dots[top1].attr({fill: "#fff"});
+
+
+	var squarey = [ yCoords[top1]+y0,yCoords[top2]+y0,yCoords[top2]+yCoords[top3]-yCoords[top1]+y0,yCoords[top3]+y0];
+	var squarex = [ xCoords[top1]+x0,xCoords[top2]+x0,xCoords[top2]+xCoords[top3]-xCoords[top1]+x0,xCoords[top3]+x0];
+	drawPolygon(1,squarex,squarey,"#699");
+squarey = [yCoords[top1]+y0,yCoords[top2]+y0,yCoords[bottom3]+y0,yCoords[bottom2]+yCoords[bottom3]-yCoords[bottom1]+y0];
+squarex = [xCoords[top1]+x0,xCoords[top2]+x0,xCoords[bottom3]+x0,xCoords[bottom2]+xCoords[bottom3]-xCoords[bottom1]+x0];
+	drawPolygon(2,squarex,squarey,"#366");
+squarey = [yCoords[top1]+y0,yCoords[top3]+y0,yCoords[bottom2]+y0,yCoords[bottom2]+yCoords[bottom3]-yCoords[bottom1]+y0];
+squarex = [xCoords[top1]+x0,xCoords[top3]+x0,xCoords[bottom2]+x0,xCoords[bottom2]+xCoords[bottom3]-xCoords[bottom1]+x0];
+	drawPolygon(3,squarex,squarey,"#255");
 }
+function drawPolygon(index,sqx,sqy,color){ 
+	var mypat = "M "+sqx[0]+" "+sqy[0];
+	var numbers = [0,1,2,3];
+	for (var c=1;c<4;c++) mypat+="  L "+sqx[numbers[c]]+" "+sqy[numbers[c]];
+	mypat+=" z";
+	if (!cubeside[index]) cubeside[index] = canvas.path().attr({stroke: "none", fill: "#000"});
+	cubeside[index].show().attr({ path: mypat, fill: color });
+} 
 function update(){ 
 	if (nu) drawCanvas();
 	nu=false;
